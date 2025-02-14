@@ -24,8 +24,10 @@ function HomePage() {
   const [episodeNames, setEpisodeNames] = useState<{ [key: number]: string }>(
     {}
   );
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get(
         `https://rickandmortyapi.com/api/character?page=${page}&name=${search}`,
@@ -33,6 +35,7 @@ function HomePage() {
       )
       .then((response) => {
         setCharacters(response.data.results.splice(0, 18));
+        setLoading(false);
       });
   }, [page, search]);
 
@@ -64,8 +67,8 @@ function HomePage() {
   const endPage = Math.min(totalPages, startPage + maxPageNumbers - 1);
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="w-full max-w-6xl">
+    <div className="flex justify-center items-center min-h-screen my-8">
+      <div className="w-full max-w-fit">
         <div className="flex items-center mb-4">
           <Image
             src="/favicon.ico"
@@ -119,67 +122,72 @@ function HomePage() {
             </ul>
           </nav>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 bg-gray-800 p-10 rounded-lg">
-          {characters.map((character) => (
-            <div
-              key={character.id}
-              className="flex bg-gray-600 text-white rounded-xl overflow-hidden"
-            >
-              <Image
-                width={208}
-                height={208}
-                alt={character.name}
-                src={character.image}
-              />
-              <div className="flex flex-col justify-center items-start text-base ml-2">
-                <h2 className="text-2xl font-bold">{character.name}</h2>
-                {character.status === "Alive" ? (
-                  <p className="font-semibold flex">
-                    <Image
-                      src="/green.svg"
-                      alt=""
-                      width={12}
-                      height={12}
-                      className="mr-2"
-                    />{" "}
-                    {character.status} - {character.species}
-                  </p>
-                ) : character.status === "Dead" ? (
-                  <p className="font-semibold flex">
-                    <Image
-                      src="/red.svg"
-                      alt=""
-                      width={12}
-                      height={12}
-                      className="mr-2"
-                    />{" "}
-                    {character.status} - {character.species}
-                  </p>
-                ) : (
-                  <p className="font-semibold flex">
-                    <Image
-                      src="/gray.svg"
-                      alt=""
-                      width={12}
-                      height={12}
-                      className="mr-2"
-                    />{" "}
-                    {character.status} - {character.species}
-                  </p>
-                )}
+        {loading ? (
+          <div className="text-center text-white">Loading...</div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 bg-gray-800 p-10 rounded-lg w-full">
+            {characters.map((character) => (
+              <div
+                key={character.id}
+                className="flex bg-gray-600 text-white rounded-xl overflow-hidden"
+              >
+                <Image
+                  width={200}
+                  height={190}
+                  alt={character.name}
+                  src={character.image}
+                  className="w-24 h-auto sm:w-32 sm:h-auto md:w-40 md:h-auto lg:w-48 lg:h-auto xl:w-52 xl:h-auto 2xl:w-56 2xl:h-56"
+                />
+                <div className="flex flex-col justify-center items-start text-base ml-2">
+                  <h2 className="text-2xl font-bold">{character.name}</h2>
+                  {character.status === "Alive" ? (
+                    <p className="font-semibold flex">
+                      <Image
+                        src="/green.svg"
+                        alt=""
+                        width={12}
+                        height={12}
+                        className="mr-2"
+                      />{" "}
+                      {character.status} - {character.species}
+                    </p>
+                  ) : character.status === "Dead" ? (
+                    <p className="font-semibold flex">
+                      <Image
+                        src="/red.svg"
+                        alt=""
+                        width={12}
+                        height={12}
+                        className="mr-2"
+                      />{" "}
+                      {character.status} - {character.species}
+                    </p>
+                  ) : (
+                    <p className="font-semibold flex">
+                      <Image
+                        src="/gray.svg"
+                        alt=""
+                        width={12}
+                        height={12}
+                        className="mr-2"
+                      />{" "}
+                      {character.status} - {character.species}
+                    </p>
+                  )}
 
-                <p className="text-gray-400 mt-2">Last known location:</p>
-                <a href={character.location.url} className="text-lg">
-                  {character.location.name}
-                </a>
-                <p className="text-gray-400 mt-2">First seen in:</p>
-                <a href={character.episode[0]} className="text-lg">
-                  {episodeNames[character.id] || "Loading..."}
-                </a>
+                  <p className="text-gray-400 mt-2">Last known location:</p>
+                  <a href={character.location.url} className="text-lg">
+                    {character.location.name}
+                  </a>
+                  <p className="text-gray-400 mt-2">First seen in:</p>
+                  <a href={character.episode[0]} className="text-lg">
+                    {episodeNames[character.id] || "Loading..."}
+                  </a>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
